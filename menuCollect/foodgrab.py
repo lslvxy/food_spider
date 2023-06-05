@@ -87,7 +87,7 @@ def fetch_config_data(soup, variables):
 
 # def output_image():
 
-def parse_foodgrab(page_url, variables):
+def parse_foodgrab(page_url, variables ,lan):
     restaurant_data, soup = fetch_restaurant(page_url)
     if restaurant_data is None:
         return None
@@ -107,8 +107,9 @@ def parse_foodgrab(page_url, variables):
             # out.clear()
             total_category = category_name
             store_name = page_url.split('/')[-1]
-            if not os.path.exists(f"..\\Aim_menu\\food_grab\\{store_name}\\{category_name}"):
-                os.makedirs(f"..\\Aim_menu\\food_grab\\{store_name}\\{category_name}")
+            # os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")
+            if not os.path.exists(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")):
+                os.makedirs(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}"))
             total_item_name = item_name
             total_description = product.get('description')
             total_item_price = product.get('offers').get('price')
@@ -120,7 +121,8 @@ def parse_foodgrab(page_url, variables):
                 if total_item_image != []:
                     item_image = product_item.get('images')[0]
                     r = requests.get(item_image, timeout=180)
-                    with open(f"..\\Aim_menu\\food_grab\\{store_name}\\{category_name}\\{item_name}.jpg", 'wb') as f:
+                    image_path = os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}", f"{item_name}.jpg")
+                    with open(image_path, 'wb') as f:
                         f.write(r.content)
                 modifier_groups = product_item.get('modifierGroups')
                 for modifier_group in modifier_groups:
@@ -177,9 +179,10 @@ def parse_foodgrab(page_url, variables):
         food_grab_excel_list.append([excel_category_name, excel_item_name, excel_description, excel_item_price, excel_modifier_group, excel_select_type, excel_required_or_not, excel_min_available, excel_max_available, excel_options, excel_options_price])
         i += 1
     df = pd.DataFrame(food_grab_excel_list, columns=["category_name", "item_name", "description", "item_price", "modifier_group","select_type", "required_or_not", "min_available", "max_available", "options", "options_price"])
-    if os.path.exists(f"..\\Aim_menu\\food_grab\\{store_name}.xlsx"):
-    	os.remove(f"..\\Aim_menu\\food_grab\\{store_name}.xlsx")
-    df.to_excel(f"..\\Aim_menu\\food_grab\\{store_name}.xlsx", index=False)
+    xlsx_path = os.path.join("..", "Aim_menu", "food_grab", f"{store_name}.xlsx")
+    if os.path.exists(xlsx_path):
+        os.remove(xlsx_path)
+    df.to_excel(xlsx_path, index=False)
     log.append("Collection complete")
     logging.info("Collection complete")
     return log

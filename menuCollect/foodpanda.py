@@ -68,9 +68,12 @@ def parse_foodpanda(page_url, variables):
     for category in menu_categories:
         products_list = category.get('products', None)
         full_category_name = category['name']
-        category_name = re.sub(r'[:/\\?*“”<>|""]', '_',full_category_name)
-        if not os.path.exists(f"..\\Aim_menu\\food_panda\\{store_name}\\{category_name}"):
-            os.makedirs(f"..\\Aim_menu\\food_panda\\{store_name}\\{category_name}")
+        category_name = re.sub(r'[:/\\?*“”<>|""]', '_', full_category_name)
+        full_category_descrption = category['description']
+        category_description = re.sub(r'[:/\\?*“”<>|""]', '_', full_category_descrption)
+        # os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")
+        if not os.path.exists(os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")):
+            os.makedirs(os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}"))
         if products_list is None:
             logging.info("category：{name}，no information".format(name=category['name']))
             continue
@@ -79,6 +82,7 @@ def parse_foodpanda(page_url, variables):
             # result.clear()
             item_name = re.sub(r'[:/\\?*“”<>|""]', '_', product.get('name'))
             total_category = category_name
+            total_category_descrption = category_description
             total_item_name = item_name
             total_description = product.get('description')
             product_variations = product.get('product_variations')
@@ -86,16 +90,24 @@ def parse_foodpanda(page_url, variables):
             if total_image != '':
                 item_image = total_image
                 r = requests.get(item_image, timeout=180)
-                with open(f"..\\Aim_menu\\food_panda\\{store_name}\\{category_name}\\{item_name}.jpg", 'wb') as f:
+                image_path = os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}",
+                                          f"{item_name}.jpg")
+                with open(image_path, 'wb') as f:
                     f.write(r.content)
             if product_variations is None:
                 log.append("product ：{name}，no information".format(name=product.get('name')))
                 logging.info("product ：{name}，no information".format(name=product.get('name')))
                 continue
             for pv in product_variations:
-                total_package_type = pv.get('name', '默认')
+                total_package_type = pv.get('name', '')
                 total_package_price = pv.get('price')
                 topping_ids = pv['topping_ids']
+                # result = {}
+                # result['category'] = total_category
+                # result['category_description'] = total_category_descrption
+                # result['modifier_group'] = total_package_type
+                # result['options'] = total_package_type
+                # food_panda_list.append(result)
                 if topping_ids:
                     for id in topping_ids:
                         topping = toppings.get(str(id))
@@ -103,13 +115,14 @@ def parse_foodpanda(page_url, variables):
                         total_select_type = '单选' if topping.get('quantity_maximum') == 1 else '多选'
                         total_required_or_not = topping.get('quantity_minimum') == topping.get('quantity_maximum') == 1
                         total_min_available = topping.get('quantity_minimum')
-                        total_max_available= topping.get('quantity_maximum')
+                        total_max_available = topping.get('quantity_maximum')
                         options = topping['options']
                         for op in options:
                             total_options = op.get('name')
                             total_options_price = op.get('price')
-                            result={}
+                            result = {}
                             result['category'] = total_category
+                            result['category_description'] = total_category_descrption
                             result['item_name'] = total_item_name
                             result['description'] = total_description
                             result['package_type'] = total_package_type
@@ -124,6 +137,7 @@ def parse_foodpanda(page_url, variables):
                             food_panda_list.append(result)
             result = {}
             result['category'] = total_category
+            result['category_description'] = total_category_descrption
             result['item_name'] = total_item_name
             result['description'] = total_description
             result['package_type'] = total_package_type
@@ -139,12 +153,29 @@ def parse_foodpanda(page_url, variables):
     food_panda_excel_list = []
     i = 0
     while i < len(food_panda_list):
-        excel_category_name = (food_panda_list[i]).get('category')
-        excel_item_name = (food_panda_list[i]).get('item_name')
-        excel_description = (food_panda_list[i]).get('description')
+        excel_outlet_id = ''
+        excel_outlet_services = ''
+        excel_over_write = ''
+        excel_category_name_en = (food_panda_list[i]).get('category')
+        excel_category_name_th = 1
+        excel_category_name_cn = 2
+        excel_category_sku = 3
+        excel_category_description_en = (food_panda_list[i]).get('category_description')
+        excel_category_description_th = 4
+        excel_category_description_cn = 5
+        excel_item_name_en = (food_panda_list[i]).get('item_name')
+        excel_item_name_th = 6
+        excel_item_name_cn = 7
+        excel_item_name_sku = 8
+        excel_item_image = (food_panda_list[i]).get('item_name') + '.jpg'
+        excel_description_en = 9
+        excel_description_th = 10
+        excel_description_cn = 11
         excel_package_type = (food_panda_list[i]).get('package_type')
         excel_package_price = (food_panda_list[i]).get('package_price')
-        excel_modifier_group = (food_panda_list[i]).get('modifier_group')
+        excel_modifier_group_en = (food_panda_list[i]).get('modifier_group')
+        excel_modifier_group_th = 11
+        excel_modifier_group_cn = 11
         excel_select_type = (food_panda_list[i]).get('select_type')
         excel_required_or_not = (food_panda_list[i]).get('required_or_not')
         excel_min_available = (food_panda_list[i]).get('min_available')
@@ -152,23 +183,24 @@ def parse_foodpanda(page_url, variables):
         excel_options = (food_panda_list[i]).get('options')
         excel_options_price = (food_panda_list[i]).get('options_price')
         food_panda_excel_list.append(
-            [excel_category_name, excel_item_name, excel_description, excel_package_type, excel_package_price, excel_modifier_group,
+            [excel_category_name_en, excel_item_name_en, excel_description_en, excel_package_type, excel_package_price,
+             excel_modifier_group_en,
              excel_select_type, excel_required_or_not, excel_min_available, excel_max_available, excel_options,
              excel_options_price])
         i += 1
     df = pd.DataFrame(food_panda_excel_list,
-                      columns=["category_name", "item_name", "description", "package_type", "package_price", "modifier_group",
+                      columns=["category_name", "item_name", "description", "package_type", "package_price",
+                               "modifier_group",
                                "select_type", "required_or_not", "min_available", "max_available", "options",
                                "options_price"])
-    if os.path.exists(f"..\\Aim_menu\\food_panda\\{store_name}.xlsx"):
-        os.remove(f"..\\Aim_menu\\food_panda\\{store_name}.xlsx")
-    df.to_excel(f"..\\Aim_menu\\food_panda\\{store_name}.xlsx", index=False)
+    xlsx_path = os.sep.join(["..", "Aim_menu", "food_panda", f"{store_name}.xlsx"])
+    if os.path.exists(xlsx_path):
+        os.remove(xlsx_path)
+    logging.info(xlsx_path)
+    df.to_excel(xlsx_path)
     log.append("Collection complete")
     logging.info("Collection complete")
     return log
-
-
-
 
 # if __name__ == '__main__':
 #     test_url = 'https://www.foodpanda.hk/restaurant/v3iw/bakeout-homemade-koppepan'
