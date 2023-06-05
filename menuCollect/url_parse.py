@@ -45,6 +45,28 @@ def parse_foodpanda(parse_result):
     return result
 
 
+
+def isEn(variables):
+    if variables.get('language', 'en') == 'en':
+        return True
+    else:
+        return False
+
+
+def isCn(variables):
+    if variables.get('language', 'en') == 'cn':
+        return True
+    else:
+        return False
+
+
+def isTh(variables):
+    if variables.get('language', 'en') == 'th':
+        return True
+    else:
+        return False
+
+
 # if __name__ == '__main__':
     # print(url_parse('https://food.grab.com/sg/en/restaurant/mcdonald-s-jurong-green-cc-delivery/SGDD04996'))
     # print(url_parse('https://food.grab.com/my/en/restaurant/hominsan-pavilion-non-halal-delivery/MYDD12622'))

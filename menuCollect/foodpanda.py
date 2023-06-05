@@ -6,6 +6,11 @@ import re
 import requests
 import pandas as pd
 
+from menuCollect.url_parse import isEn
+from menuCollect.url_parse import isCn
+
+from menuCollect.url_parse import isTh
+
 log = []
 bc = logging.basicConfig(level=logging.INFO, format='%(asctime)s  - %(message)s')
 
@@ -36,27 +41,6 @@ def fetch_json(page_url, variables):
         logging.info("Page response failed, please check network link and try again later")
         return None
     return response.json()
-
-
-def isEn(variables):
-    if variables.get('language', 'en') == 'en':
-        return True
-    else:
-        return False
-
-
-def isCn(variables):
-    if variables.get('language', 'en') == 'cn':
-        return True
-    else:
-        return False
-
-
-def isTh(variables):
-    if variables.get('language', 'en') == 'th':
-        return True
-    else:
-        return False
 
 
 def parse_foodpanda(page_url, variables):
@@ -192,7 +176,7 @@ def parse_foodpanda(page_url, variables):
     food_panda_excel_list = []
     i = 0
     while i < len(food_panda_list):
-        excel_language = variables.get('language', 'en')
+        excel_language = variables.get('language', 'EN')
         excel_outlet_id = ''
         excel_outlet_services = ''
         excel_over_write = ''
@@ -268,7 +252,7 @@ def parse_foodpanda(page_url, variables):
                                "modifier_th", "modifier_cn", "modifier_sku", "modifier_description_en",
                                "modifier_description_th", "modifier_description_cn", "options_price"])
     df.index = range(1, len(df) + 1)
-    xlsx_path = os.sep.join(["..", "Aim_menu", "food_panda", f"{store_name}.xlsx"])
+    xlsx_path = os.path.join(["..", "Aim_menu", "food_panda", f"{store_name}.xlsx"])
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     logging.info(xlsx_path)
