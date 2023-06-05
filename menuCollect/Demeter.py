@@ -36,6 +36,7 @@ class Ui_menuSelect(object):
         self.lineEdit = QLineEdit(menuSelect)
         self.lineEdit.setObjectName(u"lineEdit")
         self.lineEdit.setGeometry(QRect(80, 80, 311, 22))
+        self.lineEdit.setText("https://www.foodpanda.com.tw/en/restaurant/w3ki/ji-ye-jia-yoshinoya-xin-bei-yong-he-dian")
 
         self.retranslateUi(menuSelect)
 

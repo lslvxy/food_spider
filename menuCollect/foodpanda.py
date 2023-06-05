@@ -38,6 +38,27 @@ def fetch_json(page_url, variables):
     return response.json()
 
 
+def isEn(variables):
+    if variables.get('language', 'en') == 'en':
+        return True
+    else:
+        return False
+
+
+def isCn(variables):
+    if variables.get('language', 'en') == 'cn':
+        return True
+    else:
+        return False
+
+
+def isTh(variables):
+    if variables.get('language', 'en') == 'th':
+        return True
+    else:
+        return False
+
+
 def parse_foodpanda(page_url, variables):
     product_info = fetch_json(page_url, variables)
     root_data = product_info.get('data', None)
@@ -98,9 +119,37 @@ def parse_foodpanda(page_url, variables):
                 log.append("product ：{name}，no information".format(name=product.get('name')))
                 logging.info("product ：{name}，no information".format(name=product.get('name')))
                 continue
+            if len(product_variations) == 1:
+                logging.info("only one product ：{name}，no information".format(name=product.get('name')))
+            elif len(product_variations) > 1:
+                logging.info("multiple products ：{name}".format(name=product.get('name')))
+                for pv in product_variations:
+                    total_package_type = pv.get('name', '')
+                    total_package_price = pv.get('price')
+                    result = {'category': total_category, 'category_description': total_category_descrption,
+                              'item_name': total_item_name, 'description': total_description, 'package_type': 'Combo',
+                              'package_price': total_package_price, 'options': total_package_type}
+                    food_panda_list.append(result)
+
             for pv in product_variations:
                 total_package_type = pv.get('name', '')
                 total_package_price = pv.get('price')
+                result = {}
+                result['category'] = total_category
+                result['category_description'] = total_category_descrption
+                result['item_name'] = total_item_name
+                result['description'] = total_description
+                result['package_type'] = total_package_type
+                result['package_price'] = total_package_price
+
+                # result['modifier_group'] = total_modifier_group
+                # result['select_type'] = total_select_type
+                # result['required_or_not'] = total_required_or_not
+                # result['min_available'] = total_min_available
+                # result['max_available'] = total_max_available
+                # result['options'] = total_options
+                # result['options_price'] = total_options_price
+                food_panda_list.append(result)
                 topping_ids = pv['topping_ids']
                 # result = {}
                 # result['category'] = total_category
@@ -109,11 +158,15 @@ def parse_foodpanda(page_url, variables):
                 # result['options'] = total_package_type
                 # food_panda_list.append(result)
                 if topping_ids:
-                    for id in topping_ids:
-                        topping = toppings.get(str(id))
+                    for topping_id in topping_ids:
+                        topping = toppings.get(str(topping_id))
                         total_modifier_group = topping.get('name')
-                        total_select_type = '单选' if topping.get('quantity_maximum') == 1 else '多选'
-                        total_required_or_not = topping.get('quantity_minimum') == topping.get('quantity_maximum') == 1
+                        total_select_type = 'Single' if topping.get('quantity_maximum') == 1 else 'Multiple'
+                        if topping.get('quantity_minimum') == topping.get('quantity_maximum') == 1:
+                            total_required_or_not = "TRUE"
+                        else:
+                            total_required_or_not = "FALSE"
+
                         total_min_available = topping.get('quantity_minimum')
                         total_max_available = topping.get('quantity_maximum')
                         options = topping['options']
@@ -135,69 +188,91 @@ def parse_foodpanda(page_url, variables):
                             result['options'] = total_options
                             result['options_price'] = total_options_price
                             food_panda_list.append(result)
-            result = {}
-            result['category'] = total_category
-            result['category_description'] = total_category_descrption
-            result['item_name'] = total_item_name
-            result['description'] = total_description
-            result['package_type'] = total_package_type
-            result['package_price'] = total_package_price
-            # result['modifier_group'] = total_modifier_group
-            # result['select_type'] = total_select_type
-            # result['required_or_not'] = total_required_or_not
-            # result['min_available'] = total_min_available
-            # result['max_available'] = total_max_available
-            # result['options'] = total_options
-            # result['options_price'] = total_options_price
-            food_panda_list.append(result)
+
     food_panda_excel_list = []
     i = 0
     while i < len(food_panda_list):
+        excel_language = variables.get('language', 'en')
         excel_outlet_id = ''
         excel_outlet_services = ''
         excel_over_write = ''
-        excel_category_name_en = (food_panda_list[i]).get('category')
-        excel_category_name_th = 1
-        excel_category_name_cn = 2
-        excel_category_sku = 3
-        excel_category_description_en = (food_panda_list[i]).get('category_description')
-        excel_category_description_th = 4
-        excel_category_description_cn = 5
-        excel_item_name_en = (food_panda_list[i]).get('item_name')
-        excel_item_name_th = 6
-        excel_item_name_cn = 7
-        excel_item_name_sku = 8
+        excel_category_name_en = (food_panda_list[i]).get('category') if isEn(variables) else ''
+        excel_category_name_th = (food_panda_list[i]).get('category') if isTh(variables) else ''
+        excel_category_name_cn = (food_panda_list[i]).get('category') if isCn(variables) else ''
+        excel_category_sku = ''
+        excel_category_description_en = (food_panda_list[i]).get('category_description') if isEn(variables) else ''
+        excel_category_description_th = (food_panda_list[i]).get('category_description') if isTh(variables) else ''
+        excel_category_description_cn = (food_panda_list[i]).get('category_description') if isCn(variables) else ''
+        excel_item_name_en = (food_panda_list[i]).get('item_name') if isEn(variables) else ''
+        excel_item_name_th = (food_panda_list[i]).get('item_name') if isTh(variables) else ''
+        excel_item_name_cn = (food_panda_list[i]).get('item_name') if isCn(variables) else ''
+        excel_item_sku = ''
         excel_item_image = (food_panda_list[i]).get('item_name') + '.jpg'
-        excel_description_en = 9
-        excel_description_th = 10
-        excel_description_cn = 11
-        excel_package_type = (food_panda_list[i]).get('package_type')
-        excel_package_price = (food_panda_list[i]).get('package_price')
-        excel_modifier_group_en = (food_panda_list[i]).get('modifier_group')
-        excel_modifier_group_th = 11
-        excel_modifier_group_cn = 11
+        excel_description_en = (food_panda_list[i]).get('description') if isEn(variables) else ''
+        excel_description_th = (food_panda_list[i]).get('description') if isTh(variables) else ''
+        excel_description_cn = (food_panda_list[i]).get('description') if isCn(variables) else ''
+        excel_conditional_modifier_group = (food_panda_list[i]).get('package_type')
+        excel_conditional_modifier = ''
+        excel_item_price = (food_panda_list[i]).get('package_price')
+
+        excel_modifier_group_en = (food_panda_list[i]).get('modifier_group') if isEn(variables) else ''
+        excel_modifier_group_th = (food_panda_list[i]).get('modifier_group') if isTh(variables) else ''
+        excel_modifier_group_cn = (food_panda_list[i]).get('modifier_group') if isCn(variables) else ''
+        excel_modifier_group_sku = ''
+        excel_modifier_group_description_en = ''
+        excel_modifier_group_description_th = ''
+        excel_modifier_group_description_cn = ''
         excel_select_type = (food_panda_list[i]).get('select_type')
         excel_required_or_not = (food_panda_list[i]).get('required_or_not')
         excel_min_available = (food_panda_list[i]).get('min_available')
         excel_max_available = (food_panda_list[i]).get('max_available')
-        excel_options = (food_panda_list[i]).get('options')
+
+        excel_modifier_en = (food_panda_list[i]).get('options') if isEn(variables) else ''
+        excel_modifier_th = (food_panda_list[i]).get('options') if isTh(variables) else ''
+        excel_modifier_cn = (food_panda_list[i]).get('options') if isCn(variables) else ''
+        excel_modifier_sku = ''
+        excel_modifier_description_en = ''
+        excel_modifier_description_th = ''
+        excel_modifier_description_cn = ''
         excel_options_price = (food_panda_list[i]).get('options_price')
+
         food_panda_excel_list.append(
-            [excel_category_name_en, excel_item_name_en, excel_description_en, excel_package_type, excel_package_price,
-             excel_modifier_group_en,
-             excel_select_type, excel_required_or_not, excel_min_available, excel_max_available, excel_options,
+            [excel_language, excel_outlet_id, excel_outlet_services, excel_over_write,
+             excel_category_name_en, excel_category_name_th, excel_category_name_cn, excel_category_sku,
+             excel_category_description_en, excel_category_description_th, excel_category_description_cn,
+             excel_item_name_en, excel_item_name_th, excel_item_name_cn, excel_item_sku, excel_item_image,
+             excel_description_en, excel_description_th, excel_description_cn, excel_conditional_modifier_group,
+             excel_conditional_modifier, excel_item_price,
+             excel_modifier_group_en, excel_modifier_group_th, excel_modifier_group_cn, excel_modifier_group_sku,
+             excel_modifier_group_description_en, excel_modifier_group_description_th,
+             excel_modifier_group_description_cn,
+             excel_select_type, excel_required_or_not, excel_min_available, excel_max_available,
+             excel_modifier_en, excel_modifier_th, excel_modifier_cn, excel_modifier_sku,
+             excel_modifier_description_en, excel_modifier_description_th, excel_modifier_description_cn,
              excel_options_price])
         i += 1
+    #     	Outlet ID
+
     df = pd.DataFrame(food_panda_excel_list,
-                      columns=["category_name", "item_name", "description", "package_type", "package_price",
-                               "modifier_group",
-                               "select_type", "required_or_not", "min_available", "max_available", "options",
-                               "options_price"])
+                      columns=["Language", "Outlet ID", "Outlet services", "Overwrite (Y/N)", "category_name_en",
+                               "category_name_th",
+                               "category_name_cn", "category_sku", "category_description_en",
+                               "category_description_th",
+                               "category_description_cn", "item_name_en", "item_name_th", "item_name_cn", "item_sku",
+                               "item_image", "description_en", "description_th", "description_cn",
+                               "conditional_modifier_group", "conditional_modifier", "item_price", "modifier_group_en",
+                               "modifier_group_th", "modifier_group_cn", "modifier_group_sku",
+                               "modifier_group_description_en", "modifier_group_description_th",
+                               "modifier_group_description_cn", "select_type",
+                               "required_or_not", "min_available", "max_available", "modifier_en",
+                               "modifier_th", "modifier_cn", "modifier_sku", "modifier_description_en",
+                               "modifier_description_th", "modifier_description_cn", "options_price"])
+    df.index = range(1, len(df) + 1)
     xlsx_path = os.sep.join(["..", "Aim_menu", "food_panda", f"{store_name}.xlsx"])
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     logging.info(xlsx_path)
-    df.to_excel(xlsx_path)
+    df.to_excel(xlsx_path, index_label="序号")
     log.append("Collection complete")
     logging.info("Collection complete")
     return log
