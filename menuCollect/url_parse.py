@@ -47,21 +47,21 @@ def parse_foodpanda(parse_result):
 
 
 def isEn(variables):
-    if variables.get('language', 'en') == 'en':
+    if variables.get('language', 'EN') == 'EN':
         return True
     else:
         return False
 
 
 def isCn(variables):
-    if variables.get('language', 'en') == 'cn':
+    if variables.get('language', 'EN') == 'CN':
         return True
     else:
         return False
 
 
 def isTh(variables):
-    if variables.get('language', 'en') == 'th':
+    if variables.get('language', 'EN') == 'TH':
         return True
     else:
         return False

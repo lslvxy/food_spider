@@ -28,16 +28,16 @@ def fetch_soup(url):
     while i < 10:
         if response.status_code == 200:
             log.append("Request to page, data being pulled")
-            logging.info("Request to page, data being pulled")
+            print("Request to page, data being pulled")
             break
         i += 1
         log.append("Page response failed, retrying")
-        logging.info("Page response failed, retrying")
+        print("Page response failed, retrying")
         time.sleep(5)
         response = requests.request("GET", url, headers=headers, data=payload)
     if i == 10 and response.status_code != 200:
         log.append("Page response failed, please check network link and try again later")
-        logging.info("Page response failed, please check network link and try again later")
+        print("Page response failed, please check network link and try again later")
         return log
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup
@@ -59,17 +59,17 @@ def fetch_restaurant(page_url):
     while i < 10:
         if category_soup:
             log.append("Data has been pulled and is being parsed")
-            logging.info("Data has been pulled and is being parsed")
+            print("Data has been pulled and is being parsed")
             break
         i += 1
         log.append("No data pulled, retrying")
-        logging.info("No data pulled, retrying")
+        print("No data pulled, retrying")
         time.sleep(5)
         soup = fetch_soup(page_url)
         category_soup = soup.find_all("script", class_="next-head")
     if i == 10 and category_soup == []:
         log.append("Failed to pull data, please check network link and try again later")
-        logging.info("Failed to pull data, please check network link and try again later")
+        print("Failed to pull data, please check network link and try again later")
         return log
 
     data = {}
@@ -92,11 +92,9 @@ def fetch_config_data(soup, variables):
 
 def parse_foodgrab(page_url, variables):
     restaurant_data, soup = fetch_restaurant(page_url)
-    logging.info(restaurant_data)
     if restaurant_data is None:
         return None
     product_options_list = fetch_config_data(soup, variables)
-    logging.info(product_options_list)
 
     # print(menu_categories)
     tab_categories = restaurant_data.get('hasMenu').get('hasMenuSection')
@@ -105,13 +103,27 @@ def parse_foodgrab(page_url, variables):
         category_name = re.sub(r'[:/\\?*“”<>|""]', '_', category.get('name'))
         product_option = find_by_name(product_options_list, category.get('name'))
         products = category.get('hasMenuItem')
+        if len(products) == 1:
+            logging.info("only one product")
+        elif len(products) > 1:
+            logging.info("multiple products")
+            for pv in products:
+                result = {'category': category_name, 'category_description': '',
+                          'item_name': '', 'description': '', 'package_type': 'Combo',
+                          'package_price': pv.get('offers').get('price'), 'options': pv.get('name', '')}
+                food_grab_list.append(result)
+
         for product in products:
             out = {}
             product_name = product.get('name')
             item_name = re.sub(r'[:/\\?*“”<>|""]', '_', product_name)
             # out.clear()
             total_category = category_name
-            store_name = page_url.split('/')[-1]
+            title = soup.find("title").get_text()
+            if ':' in title:
+                store_name = title.split(":")[0]
+            else:
+                store_name = title
             # os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")
             if not os.path.exists(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")):
                 os.makedirs(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}"))
@@ -192,7 +204,11 @@ def parse_foodgrab(page_url, variables):
         excel_item_name_th = (food_grab_list[i]).get('item_name') if isTh(variables) else ''
         excel_item_name_cn = (food_grab_list[i]).get('item_name') if isCn(variables) else ''
         excel_item_sku = ''
-        excel_item_image =  (food_grab_list[i]).get('item_name') + '.jpg'
+        if (food_grab_list[i]).get('item_name') != '':
+            excel_item_image = (food_grab_list[i]).get('item_name') + '.jpg'
+        else:
+            excel_item_image = ''
+
         excel_description_en = (food_grab_list[i]).get('description') if isEn(variables) else ''
         excel_description_th = (food_grab_list[i]).get('description') if isTh(variables) else ''
         excel_description_cn = (food_grab_list[i]).get('description') if isCn(variables) else ''
@@ -255,7 +271,7 @@ def parse_foodgrab(page_url, variables):
         os.remove(xlsx_path)
     df.to_excel(xlsx_path, index_label="序号")
     log.append("Collection complete")
-    logging.info("Collection complete")
+    print("Collection complete")
     return log
 
 # if __name__ == '__main__':
