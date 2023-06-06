@@ -245,7 +245,7 @@ def parse_foodpanda(page_url, variables):
                                "modifier_th", "modifier_cn", "modifier_sku", "modifier_description_en",
                                "modifier_description_th", "modifier_description_cn", "options_price"])
     df.index = range(1, len(df) + 1)
-    xlsx_path = os.path.join(["..", "Aim_menu", "food_panda", f"{store_name}.xlsx"])
+    xlsx_path = os.path.join("..", "Aim_menu", "food_panda", f"{store_name}.xlsx")
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     print("Write file to " + xlsx_path)

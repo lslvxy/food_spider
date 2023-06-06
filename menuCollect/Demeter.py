@@ -121,7 +121,12 @@ class mywindow(QWidget, Ui_Widget):
             print('Unsupported page addresses')
         else:
             print('Language is ' + variables.get("language"))
-            self.findChild(QRadioButton, variables.get("language")).setChecked(True)
+            radio = self.findChild(QRadioButton, variables.get("language"))
+            if radio:
+                radio.setChecked(True)
+            else:
+                print('Use default Language EN')
+                self.findChild(QRadioButton, "EN").setChecked(True)
 
     def loginFuc(self):
         msgBox = QMessageBox()
