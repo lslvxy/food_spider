@@ -11,7 +11,6 @@ from menuCollect.url_parse import isEn
 from menuCollect.url_parse import isCn
 from menuCollect.url_parse import isTh
 
-log = []
 bc = logging.basicConfig(level=logging.INFO, format='%(asctime)s  - %(message)s')
 
 
@@ -27,18 +26,15 @@ def fetch_soup(url):
     i = 0
     while i < 10:
         if response.status_code == 200:
-            log.append("Request to page, data being pulled")
             print("Request to page, data being pulled")
             break
         i += 1
-        log.append("Page response failed, retrying")
         print("Page response failed, retrying")
         time.sleep(5)
         response = requests.request("GET", url, headers=headers, data=payload)
     if i == 10 and response.status_code != 200:
-        log.append("Page response failed, please check network link and try again later")
         print("Page response failed, please check network link and try again later")
-        return log
+        return None
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup
 
@@ -58,19 +54,16 @@ def fetch_restaurant(page_url):
     i = 0
     while i < 10:
         if category_soup:
-            log.append("Data has been pulled and is being parsed")
             print("Data has been pulled and is being parsed")
             break
         i += 1
-        log.append("No data pulled, retrying")
         print("No data pulled, retrying")
         time.sleep(5)
         soup = fetch_soup(page_url)
         category_soup = soup.find_all("script", class_="next-head")
     if i == 10 and category_soup == []:
-        log.append("Failed to pull data, please check network link and try again later")
         print("Failed to pull data, please check network link and try again later")
-        return log
+        return None, None
 
     data = {}
     for category in category_soup:
@@ -155,6 +148,8 @@ def parse_foodgrab(page_url, variables):
                                               f"{item_name}.jpg")
                     with open(image_path, 'wb') as f:
                         f.write(r.content)
+                    print("Download image: " + image_path)
+
                 modifier_groups = product_item.get('modifierGroups')
                 for modifier_group in modifier_groups:
                     total_modifier_group = modifier_group.get('name')
@@ -269,10 +264,10 @@ def parse_foodgrab(page_url, variables):
     xlsx_path = os.path.join("..", "Aim_menu", "food_grab", f"{store_name}.xlsx")
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
+    print("Write file to " + xlsx_path)
     df.to_excel(xlsx_path, index_label="序号")
-    log.append("Collection complete")
     print("Collection complete")
-    return log
+    return True
 
 # if __name__ == '__main__':
 #     url = 'https://food.grab.com/sg/en/restaurant/saap-saap-thai-jewel-changi-airport-b1-299-delivery/4-CZKELFETJBEBG6'

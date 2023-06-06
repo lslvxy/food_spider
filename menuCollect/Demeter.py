@@ -21,10 +21,11 @@ from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
                            QFont, QFontDatabase, QGradient, QIcon,
                            QImage, QKeySequence, QLinearGradient, QPainter,
-                           QPalette, QPixmap, QRadialGradient, QTransform)
+                           QPalette, QPixmap, QRadialGradient, QTransform, QWindow)
 from PySide6.QtWidgets import (QApplication, QButtonGroup, QLabel, QPushButton,
                                QRadioButton, QSizePolicy, QTextBrowser, QTextEdit,
-                               QWidget, QListWidget, QVBoxLayout, QLineEdit)
+                               QWidget, QListWidget, QVBoxLayout, QLineEdit, QMessageBox)
+
 
 class Ui_Widget(object):
     def setupUi(self, Widget):
@@ -42,15 +43,15 @@ class Ui_Widget(object):
         self.buttonGroup = QButtonGroup(Widget)
         self.buttonGroup.setObjectName(u"buttonGroup")
         self.buttonGroup.addButton(self.radioButton)
-        self.radioButton.setObjectName(u"radioButton")
+        self.radioButton.setObjectName(u"EN")
         self.radioButton.setGeometry(QRect(110, 120, 99, 20))
         self.radioButton_2 = QRadioButton(Widget)
         self.buttonGroup.addButton(self.radioButton_2)
-        self.radioButton_2.setObjectName(u"radioButton_2")
+        self.radioButton_2.setObjectName(u"TH")
         self.radioButton_2.setGeometry(QRect(320, 120, 99, 20))
         self.radioButton_3 = QRadioButton(Widget)
         self.buttonGroup.addButton(self.radioButton_3)
-        self.radioButton_3.setObjectName(u"radioButton_3")
+        self.radioButton_3.setObjectName(u"CN")
         self.radioButton_3.setGeometry(QRect(550, 120, 99, 20))
         self.label_2 = QLabel(Widget)
         self.label_2.setObjectName(u"label_2")
@@ -102,6 +103,7 @@ class mywindow(QWidget, Ui_Widget):
         sys.stdout = EmittingStr()
         sys.stdout.textWritten.connect(self.output_written)
         self.pushButton.clicked.connect(self.loginFuc)
+        self.lineEdit.textChanged.connect(self.loginFuc2)
 
     def output_written(self, text):
         cursor = self.textBrowser.textCursor()
@@ -110,19 +112,21 @@ class mywindow(QWidget, Ui_Widget):
         self.textBrowser.setTextCursor(cursor)
         self.textBrowser.ensureCursorVisible()
 
-    def loginFuc(self):
-        if self.radioButton.isChecked() == True:
-            language = 'EN'
-            # print(language)
-        elif self.radioButton_2.isChecked() == True:
-            language = 'TH'
-            # print(language)
-        elif self.radioButton_4.isChecked() == True:
-            language = 'CN'
-            # print(language)
+    def loginFuc2(self):
+        page_url = self.lineEdit.text()
+        variables = parse(page_url)
+        if variables == {}:
+            # self.a = 'Unsupported page addresses'
+            # self.ListWidget.addItem(self.a)
+            print('Unsupported page addresses')
+        else:
+            print('Language is ' + variables.get("language"))
+            self.findChild(QRadioButton, variables.get("language")).setChecked(True)
 
-        url = self.lineEdit.text()
-        page_url = url
+    def loginFuc(self):
+        msgBox = QMessageBox()
+        language = self.buttonGroup.checkedButton().text()
+        page_url = self.lineEdit.text()
 
         variables = parse(page_url)
         if variables == {}:
@@ -131,6 +135,7 @@ class mywindow(QWidget, Ui_Widget):
             print('Unsupported page addresses')
         else:
             variables['language'] = language
+            print('Language is ' + language)
             if variables.get('type') == 'foodgrab':
 
                 # self.a = parse_foodgrab(page_url, variables)
@@ -138,7 +143,14 @@ class mywindow(QWidget, Ui_Widget):
                 #     self.ListWidget.addItem(i)
                 # self.mainLayout.addWidget(self.ListWidget)
                 # self.setLayout(self.mainLayout)
-                parse_foodgrab(page_url, variables)
+                res = parse_foodgrab(page_url, variables)
+                if res:
+                    msgBox.setText("Collection Complete!")
+                    msgBox.exec()
+                else:
+                    msgBox.setText("Collection Fail!")
+                    msgBox.exec()
+
             elif variables.get('type') == 'foodpanda':
 
                 # //self.a = parse_foodpanda(page_url, variables)
@@ -146,7 +158,13 @@ class mywindow(QWidget, Ui_Widget):
                 #     self.ListWidget.addItem(i)
                 # self.mainLayout.addWidget(self.ListWidget)
                 # self.setLayout(self.mainLayout)
-                parse_foodpanda(page_url, variables)
+                res = parse_foodpanda(page_url, variables)
+                if res:
+                    msgBox.setText("Collection Complete!")
+                    msgBox.exec()
+                else:
+                    msgBox.setText("Collection Fail!")
+                    msgBox.exec()
         #         print(variables)
 
 

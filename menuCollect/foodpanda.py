@@ -11,7 +11,6 @@ from menuCollect.url_parse import isCn
 
 from menuCollect.url_parse import isTh
 
-log = []
 bc = logging.basicConfig(level=logging.INFO, format='%(asctime)s  - %(message)s')
 
 
@@ -28,17 +27,14 @@ def fetch_json(page_url, variables):
     i = 0
     while i < 10:
         if response.status_code == 200:
-            log.append("Request to page, data being pulled")
-            logging.info("Request to page, data being pulled")
+            print("Request to page, data being pulled")
             break
         i += 1
-        log.append("Page response failed, retrying")
-        logging.info("Page response failed, retrying")
+        print("Page response failed, retrying")
         time.sleep(5)
         response = requests.request("GET", complete_url, headers=headers, data=payload)
     if i == 10 and response.status_code != 200:
-        log.append("Page response failed, please check network link and try again later")
-        logging.info("Page response failed, please check network link and try again later")
+        print("Page response failed, please check network link and try again later")
         return None
     return response.json()
 
@@ -48,20 +44,17 @@ def parse_foodpanda(page_url, variables):
     root_data = product_info.get('data', None)
 
     if root_data is None:
-        log.append("Failure to parse menu data")
-        logging.info("Failure to parse menu data")
+        print("Failure to parse menu data")
         return
     menus = root_data.get('menus', None)
     if menus is None:
-        log.append("Failure to parse menu data")
-        logging.info("Failure to parse menu data")
+        print("Failure to parse menu data")
         return
 
     menu_categories = menus[0].get('menu_categories')
 
     if menu_categories is None:
-        log.append("Failure to parse menu category data")
-        logging.info("Failure to parse menu category data")
+        print("Failure to parse menu category data")
         return
     # return log
 
@@ -80,7 +73,7 @@ def parse_foodpanda(page_url, variables):
         if not os.path.exists(os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")):
             os.makedirs(os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}"))
         if products_list is None:
-            logging.info("category：{name}，no information".format(name=category['name']))
+            print("category：{name}，no information".format(name=category['name']))
             continue
         for product in products_list:
             # result = {}
@@ -99,9 +92,9 @@ def parse_foodpanda(page_url, variables):
                                           f"{item_name}.jpg")
                 with open(image_path, 'wb') as f:
                     f.write(r.content)
+                print("Download image: " + image_path)
             if product_variations is None:
-                log.append("product ：{name}，no information".format(name=product.get('name')))
-                logging.info("product ：{name}，no information".format(name=product.get('name')))
+                print("product ：{name}，no information".format(name=product.get('name')))
                 continue
             if len(product_variations) == 1:
                 logging.info("only one product ：{name}，no information".format(name=product.get('name')))
@@ -255,11 +248,10 @@ def parse_foodpanda(page_url, variables):
     xlsx_path = os.path.join(["..", "Aim_menu", "food_panda", f"{store_name}.xlsx"])
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
-    logging.info(xlsx_path)
+    print("Write file to " + xlsx_path)
     df.to_excel(xlsx_path, index_label="序号")
-    log.append("Collection complete")
-    logging.info("Collection complete")
-    return log
+    print("Collection complete")
+    return True
 
 # if __name__ == '__main__':
 #     test_url = 'https://www.foodpanda.hk/restaurant/v3iw/bakeout-homemade-koppepan'
