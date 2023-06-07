@@ -104,8 +104,10 @@ def parse_foodpanda(page_url, variables):
                     total_package_type = pv.get('name', '')
                     total_package_price = pv.get('price')
                     result = {'category': total_category, 'category_description': total_category_descrption,
-                              'item_name': total_item_name, 'description': total_description, 'package_type': 'Combo',
-                              'package_price': total_package_price, 'options': total_package_type}
+                              'item_name': total_item_name, 'description': total_description, 'modifier_group': 'Combo',
+                              'package_price': product_variations[0].get('price'), 'options': total_package_type,
+                              'options_price': total_package_price, 'select_type': 'Single', 'required_or_not': 'TRUE',
+                              'min_available': 0, 'max_available': 1}
                     food_panda_list.append(result)
 
             for pv in product_variations:
@@ -126,7 +128,6 @@ def parse_foodpanda(page_url, variables):
                 # result['max_available'] = total_max_available
                 # result['options'] = total_options
                 # result['options_price'] = total_options_price
-                food_panda_list.append(result)
                 topping_ids = pv['topping_ids']
                 # result = {}
                 # result['category'] = total_category
@@ -165,6 +166,8 @@ def parse_foodpanda(page_url, variables):
                             result['options'] = total_options
                             result['options_price'] = total_options_price
                             food_panda_list.append(result)
+                else:
+                    food_panda_list.append(result)
 
     food_panda_excel_list = []
     i = 0
@@ -188,8 +191,7 @@ def parse_foodpanda(page_url, variables):
         excel_description_en = (food_panda_list[i]).get('description') if isEn(variables) else ''
         excel_description_th = (food_panda_list[i]).get('description') if isTh(variables) else ''
         excel_description_cn = (food_panda_list[i]).get('description') if isCn(variables) else ''
-        excel_conditional_modifier_group = (food_panda_list[i]).get('package_type')
-        excel_conditional_modifier = ''
+        excel_conditional_modifier = (food_panda_list[i]).get('package_type')
         excel_item_price = (food_panda_list[i]).get('package_price')
 
         excel_modifier_group_en = (food_panda_list[i]).get('modifier_group') if isEn(variables) else ''
@@ -218,7 +220,7 @@ def parse_foodpanda(page_url, variables):
              excel_category_name_en, excel_category_name_th, excel_category_name_cn, excel_category_sku,
              excel_category_description_en, excel_category_description_th, excel_category_description_cn,
              excel_item_name_en, excel_item_name_th, excel_item_name_cn, excel_item_sku, excel_item_image,
-             excel_description_en, excel_description_th, excel_description_cn, excel_conditional_modifier_group,
+             excel_description_en, excel_description_th, excel_description_cn,
              excel_conditional_modifier, excel_item_price,
              excel_modifier_group_en, excel_modifier_group_th, excel_modifier_group_cn, excel_modifier_group_sku,
              excel_modifier_group_description_en, excel_modifier_group_description_th,
@@ -226,7 +228,7 @@ def parse_foodpanda(page_url, variables):
              excel_select_type, excel_required_or_not, excel_min_available, excel_max_available,
              excel_modifier_en, excel_modifier_th, excel_modifier_cn, excel_modifier_sku,
              excel_modifier_description_en, excel_modifier_description_th, excel_modifier_description_cn,
-             excel_options_price])
+             excel_options_price, '', '', '', '', ''])
         i += 1
     #     	Outlet ID
 
@@ -237,15 +239,16 @@ def parse_foodpanda(page_url, variables):
                                "category_description_th",
                                "category_description_cn", "item_name_en", "item_name_th", "item_name_cn", "item_sku",
                                "item_image", "description_en", "description_th", "description_cn",
-                               "conditional_modifier_group", "conditional_modifier", "item_price", "modifier_group_en",
+                               "conditional_modifier", "item_price", "modifier_group_en",
                                "modifier_group_th", "modifier_group_cn", "modifier_group_sku",
                                "modifier_group_description_en", "modifier_group_description_th",
                                "modifier_group_description_cn", "select_type",
                                "required_or_not", "min_available", "max_available", "modifier_en",
                                "modifier_th", "modifier_cn", "modifier_sku", "modifier_description_en",
-                               "modifier_description_th", "modifier_description_cn", "options_price"])
+                               "modifier_description_th", "modifier_description_cn", "options_price", "open_field1",
+                               "open_field2", "open_field3", "open_field4", "open_field5"])
     df.index = range(1, len(df) + 1)
-    xlsx_path = os.path.join("..", "Aim_menu", "food_panda", f"{store_name}.xlsx")
+    xlsx_path = os.path.join("..", "Aim_menu", "food_panda", f"{store_name}_{variables['language']}.xlsx")
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     print("Write file to " + xlsx_path)
