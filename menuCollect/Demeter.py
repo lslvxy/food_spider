@@ -132,6 +132,7 @@ class mywindow(QWidget, Ui_Widget):
         msgBox = QMessageBox()
         language = self.buttonGroup.checkedButton().text()
         page_url = self.lineEdit.text()
+        self.textBrowser.clear()
 
         variables = parse(page_url)
         if variables == {}:
@@ -139,6 +140,7 @@ class mywindow(QWidget, Ui_Widget):
             # self.ListWidget.addItem(self.a)
             print('Unsupported page addresses')
         else:
+            self.pushButton.setDisabled(True)
             variables['language'] = language
             print('Language is ' + language)
             if variables.get('type') == 'foodgrab':
@@ -170,6 +172,8 @@ class mywindow(QWidget, Ui_Widget):
                 else:
                     msgBox.setText("Collection Fail!")
                     msgBox.exec()
+            self.pushButton.setDisabled(False)
+
         #         print(variables)
 
 
