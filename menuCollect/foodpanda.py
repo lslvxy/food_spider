@@ -62,7 +62,7 @@ def parse_foodpanda(page_url, variables):
 
     # print(toppings)
     food_panda_list = []
-    store_name = menus[0].get('name')
+    store_name = root_data.get('name')
     for category in menu_categories:
         products_list = category.get('products', None)
         full_category_name = category['name']
