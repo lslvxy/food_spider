@@ -2,3 +2,5 @@
 /menuCollect/dist/
 /menuCollect/build/
 /menuCollect/Demeter.spec
+.idea/
+.DS_Store
