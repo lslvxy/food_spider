@@ -131,6 +131,7 @@ class mywindow(QWidget, Ui_Widget):
     def loginFuc(self):
         msgBox = QMessageBox()
         msgBox.setWindowTitle("Demeter")
+        msgBox.close()
         language = self.buttonGroup.checkedButton().text()
         page_url = self.lineEdit.text()
         self.textBrowser.clear()
@@ -155,15 +156,15 @@ class mywindow(QWidget, Ui_Widget):
                     res = parse_foodgrab(page_url, variables)
                     if res:
                         msgBox.setText("Collection Complete!")
-                        msgBox.exec()
+                        msgBox.open()
                     else:
                         msgBox.setText("Collection Fail!")
-                        msgBox.exec()
+                        msgBox.open()
                 except Exception:
                     print('Collection Fail!')
                     self.pushButton.setDisabled(False)
                     msgBox.setText("Collection Fail!")
-                    msgBox.exec()
+                    msgBox.open()
 
             elif variables.get('type') == 'foodpanda':
 
@@ -176,15 +177,15 @@ class mywindow(QWidget, Ui_Widget):
                     res = parse_foodpanda(page_url, variables)
                     if res:
                         msgBox.setText("Collection Complete!")
-                        msgBox.exec()
+                        msgBox.open()
                     else:
                         msgBox.setText("Collection Fail!")
-                        msgBox.exec()
+                        msgBox.open()
                 except Exception:
                     print('Collection Fail!')
                     self.pushButton.setDisabled(False)
                     msgBox.setText("Collection Fail!")
-                    msgBox.exec()
+                    msgBox.open()
             self.pushButton.setDisabled(False)
 
         #         print(variables)

@@ -125,6 +125,7 @@ def parse_foodgrab(page_url, variables):
             total_item_name = item_name
             total_description = product.get('description')
             total_item_price = product.get('offers').get('price')
+            total_item_image = ''
             # out['币种'] = str(product.get('offers').get('priceCurrency'))
             # food_grab_list.append(out)
             out = {}
@@ -141,8 +142,8 @@ def parse_foodgrab(page_url, variables):
             # out['options_price'] = total_options_price
             if product_option is not None:
                 product_item = find_by_name(product_option['items'], product_name)
-                total_item_image = product_item.get('images')
-                if total_item_image:
+                product_item_image = product_item.get('images')
+                if product_item_image:
                     item_image = product_item.get('images')[0]
                     r = requests.get(item_image, timeout=180)
                     image_path = os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}",
@@ -150,6 +151,10 @@ def parse_foodgrab(page_url, variables):
                     with open(image_path, 'wb') as f:
                         f.write(r.content)
                     print("Download image: " + image_path)
+                    out['item_image'] = f"{item_name}.jpg"
+                    total_item_image = f"{item_name}.jpg"
+                else:
+                    out['item_image'] = ''
 
                 modifier_groups = product_item.get('modifierGroups')
                 if modifier_groups:
@@ -168,10 +173,11 @@ def parse_foodgrab(page_url, variables):
                         modifier_items = modifier_group.get('modifiers')
                         for modifier_item in modifier_items:
                             total_options = modifier_item.get('name')
-                            total_options_price = (modifier_item.get('priceInMinorUnit') / 100)
+                            total_options_price = (modifier_item.get('priceV2').get('amountDisplay'))
                             out = {}
                             out['category'] = total_category
                             out['item_name'] = total_item_name
+                            out['item_image'] = total_item_image
                             out['description'] = total_description
                             out['item_price'] = total_item_price
                             out['modifier_group'] = total_modifier_group
@@ -205,10 +211,7 @@ def parse_foodgrab(page_url, variables):
         excel_item_name_th = (food_grab_list[i]).get('item_name') if isTh(variables) else ''
         excel_item_name_cn = (food_grab_list[i]).get('item_name') if isCn(variables) else ''
         excel_item_sku = ''
-        if (food_grab_list[i]).get('item_name') != '':
-            excel_item_image = (food_grab_list[i]).get('item_name') + '.jpg'
-        else:
-            excel_item_image = ''
+        excel_item_image = (food_grab_list[i]).get('item_image')
 
         excel_description_en = (food_grab_list[i]).get('description') if isEn(variables) else ''
         excel_description_th = (food_grab_list[i]).get('description') if isTh(variables) else ''
