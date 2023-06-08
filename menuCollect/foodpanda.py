@@ -6,10 +6,9 @@ import re
 import requests
 import pandas as pd
 
-from menuCollect.url_parse import isEn
-from menuCollect.url_parse import isCn
-
-from menuCollect.url_parse import isTh
+from url_parse import isEn
+from url_parse import isCn
+from url_parse import isTh
 
 bc = logging.basicConfig(level=logging.INFO, format='%(asctime)s  - %(message)s')
 
