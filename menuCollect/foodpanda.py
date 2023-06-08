@@ -40,6 +40,7 @@ def fetch_json(page_url, variables):
 
 
 def parse_foodpanda(page_url, variables):
+    homedir = str(pathlib.Path.home())
     product_info = fetch_json(page_url, variables)
     root_data = product_info.get('data', None)
 
@@ -70,8 +71,8 @@ def parse_foodpanda(page_url, variables):
         full_category_descrption = category['description']
         category_description = re.sub(r'[:/\\?*“”<>|""]', '_', full_category_descrption)
         # os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")
-        if not os.path.exists(os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")):
-            os.makedirs(os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}"))
+        if not os.path.exists(os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")):
+            os.makedirs(os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}"))
         if products_list is None:
             print("category：{name}，no information".format(name=category['name']))
             continue
@@ -88,7 +89,7 @@ def parse_foodpanda(page_url, variables):
             if total_image != '':
                 item_image = total_image
                 r = requests.get(item_image, timeout=180)
-                image_path = os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}",
+                image_path = os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}",
                                           f"{item_name}.jpg")
                 with open(image_path, 'wb') as f:
                     f.write(r.content)
@@ -248,7 +249,6 @@ def parse_foodpanda(page_url, variables):
                                "modifier_description_th", "modifier_description_cn", "options_price", "open_field1",
                                "open_field2", "open_field3", "open_field4", "open_field5"])
     df.index = range(1, len(df) + 1)
-    homedir = str(pathlib.Path.home())
     xlsx_path = os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}_{variables['language']}.xlsx")
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)

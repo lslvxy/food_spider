@@ -85,6 +85,7 @@ def fetch_config_data(soup, variables):
 # def output_image():
 
 def parse_foodgrab(page_url, variables):
+    homedir = str(pathlib.Path.home())
     restaurant_data, soup = fetch_restaurant(page_url)
     if restaurant_data is None:
         return None
@@ -118,9 +119,9 @@ def parse_foodgrab(page_url, variables):
             # out.clear()
             total_category = category_name
 
-            # os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")
-            if not os.path.exists(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")):
-                os.makedirs(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}"))
+            # os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")
+            if not os.path.exists(os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")):
+                os.makedirs(os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}"))
             total_item_name = item_name
             total_description = product.get('description')
             total_item_price = product.get('offers').get('price')
@@ -144,7 +145,7 @@ def parse_foodgrab(page_url, variables):
                 if total_item_image:
                     item_image = product_item.get('images')[0]
                     r = requests.get(item_image, timeout=180)
-                    image_path = os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}",
+                    image_path = os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}",
                                               f"{item_name}.jpg")
                     with open(image_path, 'wb') as f:
                         f.write(r.content)
@@ -266,7 +267,6 @@ def parse_foodgrab(page_url, variables):
                                "modifier_description_th", "modifier_description_cn", "options_price", "open_field1",
                                "open_field2", "open_field3", "open_field4", "open_field5"])
     df.index = range(1, len(df) + 1)
-    homedir = str(pathlib.Path.home())
     xlsx_path = os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}_{variables['language']}.xlsx")
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
