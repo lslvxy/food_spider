@@ -130,6 +130,7 @@ class mywindow(QWidget, Ui_Widget):
 
     def loginFuc(self):
         msgBox = QMessageBox()
+        msgBox.setWindowTitle("Demeter")
         language = self.buttonGroup.checkedButton().text()
         page_url = self.lineEdit.text()
         self.textBrowser.clear()
