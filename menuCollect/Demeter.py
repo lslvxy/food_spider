@@ -150,11 +150,17 @@ class mywindow(QWidget, Ui_Widget):
                 #     self.ListWidget.addItem(i)
                 # self.mainLayout.addWidget(self.ListWidget)
                 # self.setLayout(self.mainLayout)
-                res = parse_foodgrab(page_url, variables)
-                if res:
-                    msgBox.setText("Collection Complete!")
-                    msgBox.exec()
-                else:
+                try:
+                    res = parse_foodgrab(page_url, variables)
+                    if res:
+                        msgBox.setText("Collection Complete!")
+                        msgBox.exec()
+                    else:
+                        msgBox.setText("Collection Fail!")
+                        msgBox.exec()
+                except Exception:
+                    print('Collection Fail!')
+                    self.pushButton.setDisabled(False)
                     msgBox.setText("Collection Fail!")
                     msgBox.exec()
 
@@ -165,11 +171,17 @@ class mywindow(QWidget, Ui_Widget):
                 #     self.ListWidget.addItem(i)
                 # self.mainLayout.addWidget(self.ListWidget)
                 # self.setLayout(self.mainLayout)
-                res = parse_foodpanda(page_url, variables)
-                if res:
-                    msgBox.setText("Collection Complete!")
-                    msgBox.exec()
-                else:
+                try:
+                    res = parse_foodpanda(page_url, variables)
+                    if res:
+                        msgBox.setText("Collection Complete!")
+                        msgBox.exec()
+                    else:
+                        msgBox.setText("Collection Fail!")
+                        msgBox.exec()
+                except Exception:
+                    print('Collection Fail!')
+                    self.pushButton.setDisabled(False)
                     msgBox.setText("Collection Fail!")
                     msgBox.exec()
             self.pushButton.setDisabled(False)
