@@ -107,7 +107,7 @@ def parse_foodpanda(page_url, variables):
                               'item_name': total_item_name, 'description': total_description, 'modifier_group': 'Combo',
                               'package_price': product_variations[0].get('price'), 'options': total_package_type,
                               'options_price': total_package_price, 'select_type': 'Single', 'required_or_not': 'TRUE',
-                              'min_available': 0, 'max_available': 1}
+                              'min_available': 1, 'max_available': 1}
                     food_panda_list.append(result)
 
             for pv in product_variations:
@@ -252,7 +252,7 @@ def parse_foodpanda(page_url, variables):
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     print("Write file to " + xlsx_path)
-    df.to_excel(xlsx_path, index_label="序号")
+    df.to_excel(xlsx_path, index=False)
     print("Collection complete")
     return True
 

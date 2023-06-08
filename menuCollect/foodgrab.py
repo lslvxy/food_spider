@@ -266,7 +266,7 @@ def parse_foodgrab(page_url, variables):
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     print("Write file to " + xlsx_path)
-    df.to_excel(xlsx_path, index_label="序号")
+    df.to_excel(xlsx_path, index=False)
     print("Collection complete")
     return True
 
