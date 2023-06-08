@@ -150,35 +150,38 @@ def parse_foodgrab(page_url, variables):
                     print("Download image: " + image_path)
 
                 modifier_groups = product_item.get('modifierGroups')
-                for modifier_group in modifier_groups:
-                    total_modifier_group = modifier_group.get('name')
-                    total_select_type = 'Single' if modifier_group.get(
-                        'selectionType') == 0 else 'Multiple'
-                    if modifier_group.get('selectionRangeMin') == modifier_group.get(
-                            'selectionRangeMax') == 1:
-                        total_required_or_not = "TRUE"
-                    else:
-                        total_required_or_not = "FALSE"
+                if modifier_groups:
+                    for modifier_group in modifier_groups:
+                        total_modifier_group = modifier_group.get('name')
+                        total_select_type = 'Single' if modifier_group.get(
+                            'selectionType') == 0 else 'Multiple'
+                        if modifier_group.get('selectionRangeMin') == modifier_group.get(
+                                'selectionRangeMax') == 1:
+                            total_required_or_not = "TRUE"
+                        else:
+                            total_required_or_not = "FALSE"
 
-                    total_min_available = modifier_group.get('selectionRangeMin')
-                    total_max_available = modifier_group.get('selectionRangeMax')
-                    modifier_items = modifier_group.get('modifiers')
-                    for modifier_item in modifier_items:
-                        total_options = modifier_item.get('name')
-                        total_options_price = (modifier_item.get('priceInMinorUnit') / 100)
-                        out = {}
-                        out['category'] = total_category
-                        out['item_name'] = total_item_name
-                        out['description'] = total_description
-                        out['item_price'] = total_item_price
-                        out['modifier_group'] = total_modifier_group
-                        out['select_type'] = total_select_type
-                        out['required_or_not'] = total_required_or_not
-                        out['min_available'] = total_min_available
-                        out['max_available'] = total_max_available
-                        out['options'] = total_options
-                        out['options_price'] = total_options_price
-                        food_grab_list.append(out)
+                        total_min_available = modifier_group.get('selectionRangeMin')
+                        total_max_available = modifier_group.get('selectionRangeMax')
+                        modifier_items = modifier_group.get('modifiers')
+                        for modifier_item in modifier_items:
+                            total_options = modifier_item.get('name')
+                            total_options_price = (modifier_item.get('priceInMinorUnit') / 100)
+                            out = {}
+                            out['category'] = total_category
+                            out['item_name'] = total_item_name
+                            out['description'] = total_description
+                            out['item_price'] = total_item_price
+                            out['modifier_group'] = total_modifier_group
+                            out['select_type'] = total_select_type
+                            out['required_or_not'] = total_required_or_not
+                            out['min_available'] = total_min_available
+                            out['max_available'] = total_max_available
+                            out['options'] = total_options
+                            out['options_price'] = total_options_price
+                            food_grab_list.append(out)
+                else:
+                    food_grab_list.append(out)
             else:
                 food_grab_list.append(out)
 
