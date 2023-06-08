@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from url_parse import isEn
 from url_parse import isCn
 from url_parse import isTh
+import pathlib
 
 bc = logging.basicConfig(level=logging.INFO, format='%(asctime)s  - %(message)s')
 
@@ -88,7 +89,11 @@ def parse_foodgrab(page_url, variables):
     if restaurant_data is None:
         return None
     product_options_list = fetch_config_data(soup, variables)
-
+    title = soup.find("title").get_text()
+    if ':' in title:
+        store_name = title.split(":")[0]
+    else:
+        store_name = title
     # print(menu_categories)
     tab_categories = restaurant_data.get('hasMenu').get('hasMenuSection')
     food_grab_list = []
@@ -112,11 +117,7 @@ def parse_foodgrab(page_url, variables):
             item_name = re.sub(r'[:/\\?*“”<>|""]', '_', product_name)
             # out.clear()
             total_category = category_name
-            title = soup.find("title").get_text()
-            if ':' in title:
-                store_name = title.split(":")[0]
-            else:
-                store_name = title
+
             # os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")
             if not os.path.exists(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")):
                 os.makedirs(os.path.join("..", "Aim_menu", "food_grab", f"{store_name}", f"{category_name}"))
@@ -265,7 +266,8 @@ def parse_foodgrab(page_url, variables):
                                "modifier_description_th", "modifier_description_cn", "options_price", "open_field1",
                                "open_field2", "open_field3", "open_field4", "open_field5"])
     df.index = range(1, len(df) + 1)
-    xlsx_path = os.path.join("..", "Aim_menu", "food_grab", f"{store_name}_{variables['language']}.xlsx")
+    homedir = str(pathlib.Path.home())
+    xlsx_path = os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}_{variables['language']}.xlsx")
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     print("Write file to " + xlsx_path)

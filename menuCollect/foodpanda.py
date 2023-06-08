@@ -9,6 +9,7 @@ import pandas as pd
 from url_parse import isEn
 from url_parse import isCn
 from url_parse import isTh
+import pathlib
 
 bc = logging.basicConfig(level=logging.INFO, format='%(asctime)s  - %(message)s')
 
@@ -247,7 +248,8 @@ def parse_foodpanda(page_url, variables):
                                "modifier_description_th", "modifier_description_cn", "options_price", "open_field1",
                                "open_field2", "open_field3", "open_field4", "open_field5"])
     df.index = range(1, len(df) + 1)
-    xlsx_path = os.path.join("..", "Aim_menu", "food_panda", f"{store_name}_{variables['language']}.xlsx")
+    homedir = str(pathlib.Path.home())
+    xlsx_path = os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}_{variables['language']}.xlsx")
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
     print("Write file to " + xlsx_path)
