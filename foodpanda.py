@@ -86,6 +86,7 @@ def parse_foodpanda(page_url, variables):
             total_description = product.get('description')
             product_variations = product.get('product_variations')
             total_image = '' if product['images'] == [] else product['images'][0]['image_url']
+            item_image_name = ''
             if total_image != '':
                 item_image = total_image
                 r = requests.get(item_image, timeout=180)
@@ -94,6 +95,9 @@ def parse_foodpanda(page_url, variables):
                 with open(image_path, 'wb') as f:
                     f.write(r.content)
                 print("Download image: " + image_path)
+                item_image_name = f"{item_name}.jpg"
+            else:
+                item_image_name = ''
             if product_variations is None:
                 print("product ：{name}，no information".format(name=product.get('name')))
                 continue
@@ -118,6 +122,7 @@ def parse_foodpanda(page_url, variables):
                 result['category'] = total_category
                 result['category_description'] = total_category_descrption
                 result['item_name'] = total_item_name
+                result['item_image'] = item_image_name
                 result['description'] = total_description
                 result['package_type'] = total_package_type
                 result['package_price'] = total_package_price
@@ -156,6 +161,7 @@ def parse_foodpanda(page_url, variables):
                             result['category'] = total_category
                             result['category_description'] = total_category_descrption
                             result['item_name'] = total_item_name
+                            result['item_image'] = item_image_name
                             result['description'] = total_description
                             result['package_type'] = total_package_type
                             result['package_price'] = total_package_price
@@ -188,7 +194,7 @@ def parse_foodpanda(page_url, variables):
         excel_item_name_th = (food_panda_list[i]).get('item_name') if isTh(variables) else ''
         excel_item_name_cn = (food_panda_list[i]).get('item_name') if isCn(variables) else ''
         excel_item_sku = ''
-        excel_item_image = (food_panda_list[i]).get('item_name') + '.jpg'
+        excel_item_image = (food_panda_list[i]).get('item_image')
         excel_description_en = (food_panda_list[i]).get('description') if isEn(variables) else ''
         excel_description_th = (food_panda_list[i]).get('description') if isTh(variables) else ''
         excel_description_cn = (food_panda_list[i]).get('description') if isCn(variables) else ''
