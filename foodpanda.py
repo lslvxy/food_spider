@@ -145,11 +145,11 @@ def parse_foodpanda(page_url, variables):
                     for topping_id in topping_ids:
                         topping = toppings.get(str(topping_id))
                         total_modifier_group = topping.get('name')
-                        total_select_type = 'Single' if topping.get('quantity_maximum') == 1 else 'Multiple'
+                        total_required_or_not = 'TRUE' if topping.get('quantity_minimum') > 0 else 'FALSE'
                         if topping.get('quantity_minimum') == topping.get('quantity_maximum') == 1:
-                            total_required_or_not = "TRUE"
+                            total_select_type = 'Single'
                         else:
-                            total_required_or_not = "FALSE"
+                            total_select_type = 'Multiple'
 
                         total_min_available = topping.get('quantity_minimum')
                         total_max_available = topping.get('quantity_maximum')
