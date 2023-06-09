@@ -152,14 +152,7 @@ class mywindow(QWidget, Ui_Widget):
                 # self.mainLayout.addWidget(self.ListWidget)
                 # self.setLayout(self.mainLayout)
                 try:
-                    res = parse_foodgrab(page_url, variables)
-                    if res:
-                        print("Collection Complete!")
-                        # msgBox.exec()
-
-                    else:
-                        print("Collection Fail!")
-                        # msgBox.exec()
+                    parse_foodgrab(page_url, variables)
                 except Exception:
                     print('Collection Fail!')
                     self.pushButton.setDisabled(False)
@@ -173,13 +166,7 @@ class mywindow(QWidget, Ui_Widget):
                 # self.mainLayout.addWidget(self.ListWidget)
                 # self.setLayout(self.mainLayout)
                 try:
-                    res = parse_foodpanda(page_url, variables)
-                    if res:
-                        print("Collection Complete!")
-                        # msgBox.exec()
-                    else:
-                        print("Collection Fail!")
-                        # msgBox.exec()
+                    parse_foodpanda(page_url, variables)
                 except Exception:
                     print('Collection Fail!')
                     self.pushButton.setDisabled(False)
