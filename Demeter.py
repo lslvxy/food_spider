@@ -129,9 +129,8 @@ class mywindow(QWidget, Ui_Widget):
                 self.findChild(QRadioButton, "EN").setChecked(True)
 
     def loginFuc(self):
-        msgBox = QMessageBox()
-        msgBox.setWindowTitle("Demeter")
-        msgBox.close()
+        # msgBox = QMessageBox(self)
+        # msgBox.setWindowTitle("Demeter")
         language = self.buttonGroup.checkedButton().text()
         page_url = self.lineEdit.text()
         self.textBrowser.clear()
@@ -155,16 +154,16 @@ class mywindow(QWidget, Ui_Widget):
                 try:
                     res = parse_foodgrab(page_url, variables)
                     if res:
-                        msgBox.setText("Collection Complete!")
-                        msgBox.open()
+                        print("Collection Complete!")
+                        # msgBox.exec()
+
                     else:
-                        msgBox.setText("Collection Fail!")
-                        msgBox.open()
+                        print("Collection Fail!")
+                        # msgBox.exec()
                 except Exception:
                     print('Collection Fail!')
                     self.pushButton.setDisabled(False)
-                    msgBox.setText("Collection Fail!")
-                    msgBox.open()
+                    # msgBox.exec()
 
             elif variables.get('type') == 'foodpanda':
 
@@ -176,16 +175,15 @@ class mywindow(QWidget, Ui_Widget):
                 try:
                     res = parse_foodpanda(page_url, variables)
                     if res:
-                        msgBox.setText("Collection Complete!")
-                        msgBox.open()
+                        print("Collection Complete!")
+                        # msgBox.exec()
                     else:
-                        msgBox.setText("Collection Fail!")
-                        msgBox.open()
+                        print("Collection Fail!")
+                        # msgBox.exec()
                 except Exception:
                     print('Collection Fail!')
                     self.pushButton.setDisabled(False)
-                    msgBox.setText("Collection Fail!")
-                    msgBox.open()
+                    # msgBox.exec()
             self.pushButton.setDisabled(False)
 
         #         print(variables)
