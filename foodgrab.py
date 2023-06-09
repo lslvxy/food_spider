@@ -99,7 +99,7 @@ def parse_foodgrab(page_url, variables):
     tab_categories = restaurant_data.get('hasMenu').get('hasMenuSection')
     food_grab_list = []
     for category in tab_categories:
-        category_name = re.sub(r'[:/\\?*“”<>|""]', '_', category.get('name'))
+        category_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', category.get('name'))
         product_option = find_by_name(product_options_list, category.get('name'))
         products = category.get('hasMenuItem')
         # if len(products) == 1:
@@ -115,7 +115,7 @@ def parse_foodgrab(page_url, variables):
         for product in products:
             out = {}
             product_name = product.get('name')
-            item_name = re.sub(r'[:/\\?*“”<>|""]', '_', product_name)
+            item_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', product_name)
             # out.clear()
             total_category = category_name
 

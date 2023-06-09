@@ -67,9 +67,9 @@ def parse_foodpanda(page_url, variables):
     for category in menu_categories:
         products_list = category.get('products', None)
         full_category_name = category['name']
-        category_name = re.sub(r'[:/\\?*“”<>|""]', '_', full_category_name)
+        category_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', full_category_name)
         full_category_descrption = category['description']
-        category_description = re.sub(r'[:/\\?*“”<>|""]', '_', full_category_descrption)
+        category_description = re.sub(r'[:/\\?*“”<>|""\s*]', '_', full_category_descrption)
         # os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")
         if not os.path.exists(os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")):
             os.makedirs(os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}"))
@@ -79,7 +79,7 @@ def parse_foodpanda(page_url, variables):
         for product in products_list:
             # result = {}
             # result.clear()
-            item_name = re.sub(r'[:/\\?*“”<>|""]', '_', product.get('name'))
+            item_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', product.get('name'))
             total_category = category_name
             total_category_descrption = category_description
             total_item_name = item_name
