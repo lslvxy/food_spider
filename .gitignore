@@ -8,3 +8,6 @@
 build
 dist
 dist.zip
+/Demeter.app
+/Demeter.build
+/Demeter.dist

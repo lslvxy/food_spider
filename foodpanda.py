@@ -67,19 +67,20 @@ def parse_foodpanda(page_url, variables):
     for category in menu_categories:
         products_list = category.get('products', None)
         full_category_name = category['name']
-        category_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', full_category_name)
+        category_name = re.sub(r'[:/\\?*“”<>|""]', '_', full_category_name)
         full_category_descrption = category['description']
-        category_description = re.sub(r'[:/\\?*“”<>|""\s*]', '_', full_category_descrption)
+        category_description = re.sub(r'[:/\\?*“”<>|""]', '_', full_category_descrption)
         # os.path.join("..", "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")
-        if not os.path.exists(os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}")):
-            os.makedirs(os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}"))
+        dirPath = os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name.strip()}", f"{category_name.strip()}")
+        if not os.path.exists(dirPath):
+            os.makedirs(dirPath)
         if products_list is None:
             print("category：{name}，no information".format(name=category['name']))
             continue
         for product in products_list:
             # result = {}
             # result.clear()
-            item_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', product.get('name'))
+            item_name = re.sub(r'[:/\\?*“”<>|""]', '_', product.get('name'))
             total_category = category_name
             total_category_descrption = category_description
             total_item_name = item_name
@@ -90,12 +91,11 @@ def parse_foodpanda(page_url, variables):
             if total_image != '':
                 item_image = total_image
                 r = requests.get(item_image, timeout=180)
-                image_path = os.path.join(homedir, "Aim_menu", "food_panda", f"{store_name}", f"{category_name}",
-                                          f"{item_name}.jpg")
+                image_path = os.path.join(dirPath, f"{item_name.strip()}.jpg")
                 with open(image_path, 'wb') as f:
                     f.write(r.content)
                 print("Download image: " + image_path)
-                item_image_name = f"{item_name}.jpg"
+                item_image_name = f"{item_name.strip()}.jpg"
             else:
                 item_image_name = ''
             if product_variations is None:

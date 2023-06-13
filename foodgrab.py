@@ -99,7 +99,7 @@ def parse_foodgrab(page_url, variables):
     tab_categories = restaurant_data.get('hasMenu').get('hasMenuSection')
     food_grab_list = []
     for category in tab_categories:
-        category_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', category.get('name'))
+        category_name = re.sub(r'[:/\\?*“”<>|""]', '_', category.get('name'))
         product_option = find_by_name(product_options_list, category.get('name'))
         products = category.get('hasMenuItem')
         # if len(products) == 1:
@@ -115,13 +115,15 @@ def parse_foodgrab(page_url, variables):
         for product in products:
             out = {}
             product_name = product.get('name')
-            item_name = re.sub(r'[:/\\?*“”<>|""\s*]', '_', product_name)
+            item_name = re.sub(r'[:/\\?*“”<>|""]', '_', product_name)
             # out.clear()
             total_category = category_name
 
             # os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")
-            if not os.path.exists(os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}")):
-                os.makedirs(os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}"))
+            dirPath = os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name.strip()}",
+                                   f"{category_name.strip()}")
+            if not os.path.exists(dirPath):
+                os.makedirs(dirPath)
             total_item_name = item_name
             total_description = product.get('description')
             total_item_price = product.get('offers').get('price')
@@ -146,13 +148,12 @@ def parse_foodgrab(page_url, variables):
                 if product_item_image:
                     item_image = product_item.get('images')[0]
                     r = requests.get(item_image, timeout=180)
-                    image_path = os.path.join(homedir, "Aim_menu", "food_grab", f"{store_name}", f"{category_name}",
-                                              f"{item_name}.jpg")
+                    image_path = os.path.join(dirPath, f"{item_name.strip()}.jpg")
                     with open(image_path, 'wb') as f:
                         f.write(r.content)
                     print("Download image: " + image_path)
-                    out['item_image'] = f"{item_name}.jpg"
-                    total_item_image = f"{item_name}.jpg"
+                    out['item_image'] = f"{item_name.strip()}.jpg"
+                    total_item_image = f"{item_name.strip()}.jpg"
                 else:
                     out['item_image'] = ''
 

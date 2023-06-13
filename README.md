@@ -4,3 +4,7 @@
 
 不带黑窗口用户使用版（加一个-w参数）:pyinstaller -D -w menu_collect.py -p url_parse.py -p foodgrab.py -p foodpanda.py
 
+
+
+/usr/local/bin/python3 -m nuitka --follow-imports --standalone --macos-create-app-bundle --disable-console -enable-plugin=pyside6 ./Demeter.py 
+
